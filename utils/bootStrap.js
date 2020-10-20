@@ -3,6 +3,41 @@ var Config = require('../config');
 var UniversalFunctions = require('./universalFunctions');
 var Service = require('../services');
 
+const users = [
+    {
+        emailId: 'shin@admin.com',
+        password: UniversalFunctions.CryptData("123456"),
+        fullName: 'Shin Lee',
+        userType: Config.APP_CONSTANTS.DATABASE.USER_ROLES.OWNER,
+        createdAt: UniversalFunctions.getTimestamp(),
+        firstLogin: true
+    },
+    {
+        emailId: 'owner@admin.com',
+        password: UniversalFunctions.CryptData("secretpassword"),
+        fullName: 'Owner 2',
+        userType: Config.APP_CONSTANTS.DATABASE.USER_ROLES.OWNER,
+        createdAt: UniversalFunctions.getTimestamp(),
+        firstLogin: true
+    },
+    {
+        emailId: 'launchpad@admin.com',
+        password: UniversalFunctions.CryptData("123456"),
+        fullName: 'Launchpad Admin',
+        userType: Config.APP_CONSTANTS.DATABASE.USER_ROLES.SUPERADMIN,
+        createdAt: UniversalFunctions.getTimestamp(),
+        firstLogin: true
+    },
+    {
+        emailId: 'launchpad2@admin.com',
+        password: UniversalFunctions.CryptData("123456"),
+        fullName: 'Launchpad Admin 2',
+        userType: Config.APP_CONSTANTS.DATABASE.USER_ROLES.SUPERADMIN,
+        createdAt: UniversalFunctions.getTimestamp(),
+        firstLogin: true
+    }
+];
+
 var completeSuperAdminSignUp = function (DATA, callback) {
     var adminSummary = null;
     var companyDetails = null;
@@ -44,42 +79,7 @@ var completeSuperAdminSignUp = function (DATA, callback) {
 exports.bootstrapAdmin = function (callbackParent) {
     var taskToRunInParallel = [];
 
-    var adminData = [
-        {
-            emailId: 'shin@admin.com',
-            password: UniversalFunctions.CryptData("123456"),
-            fullName: 'Shin Lee',
-            userType: Config.APP_CONSTANTS.DATABASE.USER_ROLES.OWNER,
-            createdAt: UniversalFunctions.getTimestamp(),
-            firstLogin: true
-        },
-        {
-            emailId: 'owner@admin.com',
-            password: UniversalFunctions.CryptData("secretpassword"),
-            fullName: 'Owner 2',
-            userType: Config.APP_CONSTANTS.DATABASE.USER_ROLES.OWNER,
-            createdAt: UniversalFunctions.getTimestamp(),
-            firstLogin: true
-        },
-        {
-            emailId: 'launchpad@admin.com',
-            password: UniversalFunctions.CryptData("123456"),
-            fullName: 'Launchpad Admin',
-            userType: Config.APP_CONSTANTS.DATABASE.USER_ROLES.SUPERADMIN,
-            createdAt: UniversalFunctions.getTimestamp(),
-            firstLogin: true
-        },
-        {
-            emailId: 'launchpad2@admin.com',
-            password: UniversalFunctions.CryptData("123456"),
-            fullName: 'Launchpad Admin 2',
-            userType: Config.APP_CONSTANTS.DATABASE.USER_ROLES.SUPERADMIN,
-            createdAt: UniversalFunctions.getTimestamp(),
-            firstLogin: true
-        }
-    ];
-
-    adminData.forEach(function (dataObj) {
+    users.forEach(function (dataObj) {
         taskToRunInParallel.push((function (dataObj) {
             return function (embeddedCB) {
                 insertData(dataObj, embeddedCB);
