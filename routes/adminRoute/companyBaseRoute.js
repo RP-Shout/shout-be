@@ -85,18 +85,18 @@ var updateCompany = {
         validate: {
             headers: UniversalFunctions.authorizationHeaderObj,
             payload: Joi.object({
-                companyName: Joi.string().required(),
-                companyLogo: Joi.string().required(),
-                location: Joi.string().required(),
-                businessPhoneNumber: Joi.string().regex(/^[0-9]{10}$/).trim().min(2).required(),
-                contactEmail: Joi.string().required(),
-                companyDescription: Joi.string().required(),
+                companyName: Joi.string().optional().allow(''),
+                companyLogo: Joi.string().optional().allow(''),
+                location: Joi.string().optional().allow(''),
+                businessPhoneNumber: Joi.string().regex(/^[0-9]{10}$/).trim().min(2).optional().allow(''),
+                contactEmail: Joi.string().optional().allow(''),
+                companyDescription: Joi.string().optional().allow(''),
                 values: Joi.array().items(
                     {
                         name: Joi.string().required(),
                         description: Joi.string().required()
                     }
-                ).required(),
+                ).optional().allow(''),
             }),
             failAction: UniversalFunctions.failActionFunction
         },
