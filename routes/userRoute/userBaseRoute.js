@@ -559,6 +559,47 @@ var resetPassword = {
   }
 };
 
+const getManagerCredit = {
+  method: "GET",
+  path: "/api/manager/getCredit",
+  handler: (request, h) => {
+    const userData =
+      (request.auth &&
+        request.auth.credentials &&
+        request.auth.credentials.userData) ||
+      null;
+    return new Promise((resolve, reject) => {
+      Controller.UserBaseController.getManagerCredit(
+        {
+          user: userData
+        },
+        function (err, data) {
+          if (!err) {
+            resolve(UniversalFunctions.sendSuccess(null, data));
+          } else {
+            reject(UniversalFunctions.sendError(err));
+          }
+        }
+      );
+    });
+  },
+  options: {
+    description: "Get Credit",
+    tags: ["api", "manager"],
+    auth: "UserAuth",
+    validate: {
+      headers: UniversalFunctions.authorizationHeaderObj,
+      failAction: UniversalFunctions.failActionFunction
+    },
+    plugins: {
+      "hapi-swagger": {
+        responseMessages:
+          UniversalFunctions.CONFIG.APP_CONSTANTS.swaggerDefaultResponseMessages
+      }
+    }
+  }
+}
+
 var getManagerTeams = {
   method: "GET",
   path: "/api/manager/getManagerTeams",
@@ -736,6 +777,7 @@ var UserBaseRoute = [
   getManagerTeams,
   getIndividualManagerTeam,
   managerShout,
-  getManagerShoutedHistory
+  getManagerShoutedHistory,
+  getManagerCredit
 ];
 module.exports = UserBaseRoute;

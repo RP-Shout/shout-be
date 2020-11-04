@@ -1391,25 +1391,59 @@ var getManagerShoutedHistory = function (userData, callback) {
         }
       });
     },
-
     function (cb) {
-      console.log("id", userData._id)
-      Service.ShoutTransaction.getShoutTransaction({
+      Service.ShoutTransaction.getShoutTransactionPopulated({
         managerId: userData._id,
-      }, {}, {}, function (err, data) {
-        if (err) {
-          cb(err);
-        } else {
-          history = data
-          cb();
+      }, {}, {
+        path: 'receiverId managerId',
+        select: 'emailId firstName lastName userType',
+        options: {
+          lean: true
         }
-      });
+      },
+        function (err, data) {
+          if (err) {
+            cb(err);
+          } else {
+            history = data
+            cb();
+          }
+        });
     },
   ], function (err, result) {
     if (err) callback(err)
     else callback(null, { data: history })
   })
 }
+
+const getManagerCredit = (payload, callback) => {
+  const user = payload.user;
+  let userDetails;
+  let credit = 0;
+  async.series([(cb) => {
+    Service.UserService.getUser({ _id: user._id, userType: "MANAGER" }, {}, {}, (err, data) => {
+      if (err) cb(err);
+      else if (data.length === 0) cb(ERROR.INCORRECT_ACCESSTOKEN);
+      else {
+        userDetails = data[0];
+        cb(null);
+      }
+    });
+  }, (cb) => {
+    Service.UserService.getUserExtended({ userId: user._id }, {}, {}, (err, data) => {
+      if (err) cb(err);
+      else if (data.length === 0) cb(ERROR.INCORRECT_ACCESSTOKEN);
+      else {
+        credit = data[0].credits;
+        console.log(data[0]);
+        cb();
+      }
+    });
+  }], (err, data) => {
+    if (err) callback(err);
+    else callback(null, { credit: credit });
+  })
+};
 
 module.exports = {
   createUser: createUser,
@@ -1426,5 +1460,6 @@ module.exports = {
   getManagerTeams: getManagerTeams,
   getIndividualManagerTeam: getIndividualManagerTeam,
   managerShout: managerShout,
-  getManagerShoutedHistory: getManagerShoutedHistory
+  getManagerShoutedHistory: getManagerShoutedHistory,
+  getManagerCredit: getManagerCredit
 };
