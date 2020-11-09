@@ -11,7 +11,8 @@ var ERROR = UniversalFunctions.CONFIG.APP_CONSTANTS.STATUS_MSG.ERROR;
 var _ = require("underscore");
 var Config = require("../../config");
 var NodeMailer = require("../../lib/nodeMailer");
-var mongoose = require("mongoose")
+var mongoose = require("mongoose");
+const { APP_CONSTANTS } = require("../../config");
 
 /**
  * 
@@ -1374,6 +1375,8 @@ var managerShout = function (userData, payloadData, callback) {
 
 var getManagerShoutedHistory = function (userData, callback) {
   var history = null;
+  let userFound;
+  let teams = [];
   async.series([
     function (cb) {
       var criteria = {
@@ -1392,23 +1395,25 @@ var getManagerShoutedHistory = function (userData, callback) {
       });
     },
     function (cb) {
-      Service.ShoutTransaction.getShoutTransactionPopulated({
-        managerId: userData._id,
-      }, {}, {
-        path: 'receiverId managerId',
-        select: 'emailId firstName lastName userType',
-        options: {
-          lean: true
-        }
-      },
-        function (err, data) {
-          if (err) {
-            cb(err);
-          } else {
-            history = data
-            cb();
+      if (userFound)
+        Service.ShoutTransaction.getShoutTransactionPopulated({
+          managerId: userData._id,
+        }, {}, {
+          path: 'receiverId managerId',
+          select: 'emailId firstName lastName userType',
+          options: {
+            lean: true
           }
-        });
+        },
+          function (err, data) {
+            if (err) {
+              cb(err);
+            } else {
+              history = data
+              cb();
+            }
+          });
+      else cb(ERROR.USER_NOT_FOUND);
     },
   ], function (err, result) {
     if (err) callback(err)
@@ -1416,12 +1421,114 @@ var getManagerShoutedHistory = function (userData, callback) {
   })
 }
 
+const getNonShoutedUsers = (payload, callback) => {
+  const user = payload.user;
+  let nonShoutedUsers = [];
+  let userFound;
+  let usersInTeam = [];
+  let usersShouted = [];
+  let transactions = [];
+  async.series(
+    [
+      // verify manager
+      (cb) => {
+        Service.UserService.getUser({
+          _id: user._id,
+          userType: APP_CONSTANTS.DATABASE.USER_ROLES.MANAGER
+        }, { password: 0 }, {}, function (err, data) {
+          if (err) cb(err);
+          else {
+            if (data.length == 0) cb(ERROR.INCORRECT_ACCESSTOKEN);
+            else {
+              userFound = (data && data[0]) || null;
+              cb();
+            }
+          }
+        });
+      },
+      (cb) => {
+        // get teams that the manager is alloted to
+        Service.TeamService.getTeam({
+          managerIds: {
+            $in: user._id
+          },
+          isActive: true
+        }, {}, {}, (err, data) => {
+          if (err) cb(err);
+          else {
+            if (data.length === 0) cb(ERROR.NO_TEAM_ASSIGNED)
+            else {
+              teams = data;
+              cb();
+            }
+          }
+        });
+      },
+      (cb) => {
+        //Merge users from different teams
+        teams.forEach(team => {
+          if (team.userIds) {
+            team.userIds.forEach(user => {
+              if (!usersInTeam.includes(user)) usersInTeam.push(user.toString());
+            })
+          }
+        });
+        cb();
+      },
+      (cb) => {
+        Service.ShoutTransaction.getShoutTransaction({
+          managerId: user._id
+        }, { receiverId: 1 }, {}, (err, data) => {
+          if (err) cb(err)
+          else {
+            if (data.length === 0) cb(ERROR.NOT_FOUND)
+            else transactions = data;
+            cb();
+          }
+        })
+      },
+      (cb) => {
+        // filter shouted users
+        transactions.forEach(tx => {
+          if (!usersShouted.includes(tx.receiverId)) usersShouted.push(tx.receiverId.toString());
+        });
+        cb();
+      },
+      (cb) => {
+        const usersToSearch = usersInTeam.filter(x => usersShouted.includes(x));
+        Service.UserService.getUser({
+          _id: { $in: usersToSearch },
+          userType: APP_CONSTANTS.DATABASE.USER_ROLES.USER,
+          isBlocked: false,
+        }, {
+          firstName: 1,
+          lastName: 1,
+          emailId: 1,
+
+        }, {}, (err, data) => {
+          if (err) cb(err)
+          else {
+            nonShoutedUsers = data;
+            cb();
+          }
+        });
+      }
+    ]
+    , (err, data) => {
+      if (err) callback(err)
+      else callback(null, nonShoutedUsers)
+    })
+}
+
 const getManagerCredit = (payload, callback) => {
   const user = payload.user;
   let userDetails;
   let credit = 0;
   async.series([(cb) => {
-    Service.UserService.getUser({ _id: user._id, userType: "MANAGER" }, {}, {}, (err, data) => {
+    Service.UserService.getUser({
+      _id: user._id,
+      userType: APP_CONSTANTS.DATABASE.USER_ROLES.MANAGER
+    }, {}, {}, (err, data) => {
       if (err) cb(err);
       else if (data.length === 0) cb(ERROR.INCORRECT_ACCESSTOKEN);
       else {
@@ -1461,5 +1568,6 @@ module.exports = {
   getIndividualManagerTeam: getIndividualManagerTeam,
   managerShout: managerShout,
   getManagerShoutedHistory: getManagerShoutedHistory,
-  getManagerCredit: getManagerCredit
+  getManagerCredit: getManagerCredit,
+  getNonShoutedUsers: getNonShoutedUsers
 };

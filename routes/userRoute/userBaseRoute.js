@@ -600,6 +600,46 @@ const getManagerCredit = {
   }
 }
 
+const getNonShoutedUsers = {
+  method: "GET",
+  path: "/api/manager/getNonShoutedUsers",
+  handler: function (request, h) {
+    var userData =
+      (request.auth &&
+        request.auth.credentials &&
+        request.auth.credentials.userData) ||
+      null;
+    var payloadData = request.payload;
+    return new Promise((resolve, reject) => {
+      Controller.UserBaseController.getNonShoutedUsers(
+        { user: userData },
+        function (err, data) {
+          if (!err) {
+            resolve(UniversalFunctions.sendSuccess(null, data));
+          } else {
+            reject(UniversalFunctions.sendError(err));
+          }
+        }
+      );
+    });
+  },
+  options: {
+    description: "get teams",
+    tags: ["api", "manager"],
+    auth: "UserAuth",
+    validate: {
+      headers: UniversalFunctions.authorizationHeaderObj,
+      failAction: UniversalFunctions.failActionFunction
+    },
+    plugins: {
+      "hapi-swagger": {
+        responseMessages:
+          UniversalFunctions.CONFIG.APP_CONSTANTS.swaggerDefaultResponseMessages
+      }
+    }
+  }
+}
+
 var getManagerTeams = {
   method: "GET",
   path: "/api/manager/getManagerTeams",
@@ -778,6 +818,7 @@ var UserBaseRoute = [
   getIndividualManagerTeam,
   managerShout,
   getManagerShoutedHistory,
-  getManagerCredit
+  getManagerCredit,
+  getNonShoutedUsers
 ];
 module.exports = UserBaseRoute;

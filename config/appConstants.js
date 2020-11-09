@@ -247,6 +247,11 @@ var STATUS_MSG = {
       customMessage: "User Data Missing",
       type: "MISSING_USER_DATA"
     },
+    NO_TEAM_ASSIGNED: {
+      statusCode: 400,
+      customMessage: "Team not assigned.",
+      type: "NO_TEAM_ASSIGNED"
+    },
   },
   SUCCESS: {
     DEFAULT: {
