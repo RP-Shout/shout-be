@@ -10,12 +10,6 @@ var company = new Schema({
   businessPhoneNumber: { type: Number, trim: true },
   contactEmail: { type: String, unique: true, sparse: true },
   companyDescription: { type: String, trim: true },
-  values: [
-    {
-      name: { type: String, trim: true },
-      description: { type: String, trim: true }
-    }
-  ],
   teamsConfig: {
     attentionSpan: { type: Number, default: 30 },
     recognition: { type: Number, default: 100 },

@@ -10,5 +10,6 @@ module.exports = {
   TeamService: require('./teamService'),
   TopUpService: require('./topUpService'),
   ShoutedTeamHistoryService: require('./shoutedTeamHistoryService'),
-  MerchantService: require('./merchantService')
+  MerchantService: require('./merchantService'),
+  CompanyValueService: require('./companyValueService')
 };

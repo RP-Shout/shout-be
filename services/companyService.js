@@ -13,6 +13,11 @@ var getCompany = function (criteria, projection, options, callback) {
     Models.Company.find(criteria, projection, options, callback);
 };
 
+const getCompanyPopulated = (criteria, projection, populate, callback) => {
+    options.lean = true;
+    Models.Company.find(criteria).select(projection).populate(populate).exec(callback);
+}
+
 //Update Company in DB
 var updateCompany = function (criteria, dataToSet, options, callback) {
     options.lean = true;
@@ -42,5 +47,6 @@ module.exports = {
     updateCompany: updateCompany,
     createCompany: createCompany,
     getCompany: getCompany,
-    getPopulatedCompanyDetails: getPopulatedCompanyDetails
+    getPopulatedCompanyDetails: getPopulatedCompanyDetails,
+    getCompanyPopulated: getCompanyPopulated
 };
