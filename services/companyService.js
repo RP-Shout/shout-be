@@ -14,7 +14,6 @@ var getCompany = function (criteria, projection, options, callback) {
 };
 
 const getCompanyPopulated = (criteria, projection, populate, callback) => {
-    options.lean = true;
     Models.Company.find(criteria).select(projection).populate(populate).exec(callback);
 }
 

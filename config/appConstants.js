@@ -217,6 +217,11 @@ var STATUS_MSG = {
       customMessage: "Inavlid Company ID or Company not registered",
       type: "INVALID_COMPANY_ID"
     },
+    INVALID_COMPANY_VALUE_ID: {
+      statusCode: 400,
+      customMessage: "Inavlid Company Value ID or Company Value not registered",
+      type: "INVALID_COMPANY_VALUE_ID"
+    },
     INVALID_COMPANY_DETAILS: {
       statusCode: 400,
       customMessage: "Company Details can not be empty",
@@ -252,6 +257,7 @@ var STATUS_MSG = {
       customMessage: "Team not assigned.",
       type: "NO_TEAM_ASSIGNED"
     },
+
   },
   SUCCESS: {
     DEFAULT: {

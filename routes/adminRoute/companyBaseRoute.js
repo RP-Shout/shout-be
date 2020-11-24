@@ -91,12 +91,6 @@ var updateCompany = {
                 businessPhoneNumber: Joi.string().regex(/^[0-9]{10}$/).trim().min(2).optional().allow(''),
                 contactEmail: Joi.string().optional().allow(''),
                 companyDescription: Joi.string().optional().allow(''),
-                values: Joi.array().items(
-                    {
-                        name: Joi.string().required(),
-                        description: Joi.string().required()
-                    }
-                ).optional().allow(''),
             }),
             failAction: UniversalFunctions.failActionFunction
         },
@@ -141,12 +135,8 @@ var addValuesToCompany = {
         validate: {
             headers: UniversalFunctions.authorizationHeaderObj,
             payload: Joi.object({
-                values: Joi.array().items(
-                    {
-                        name: Joi.string().required(),
-                        description: Joi.string().required()
-                    }
-                ).required(),
+                name: Joi.string().required(),
+                description: Joi.string().required()
             }),
             failAction: UniversalFunctions.failActionFunction
         },
@@ -161,18 +151,22 @@ var addValuesToCompany = {
 
 var editValuesOfCompany = {
     method: "PUT",
-    path: "/api/admin/editValuesOfCompany",
+    path: "/api/admin/company/{companyId}/value/{valueId}",
     handler: function (request, h) {
         var userData =
             (request.auth &&
                 request.auth.credentials &&
                 request.auth.credentials.userData) ||
             null;
-        var payloadData = request.payload;
+        const payload = {
+            admin: userData,
+            data: request.payload,
+            valueId: request.params.valueId,
+            companyId: request.params.companyId,
+        }
         return new Promise((resolve, reject) => {
-            Controller.CompanyBaseController.editValuesOfCompany(
-                userData,
-                payloadData,
+            Controller.CompanyBaseController.updateCompanyValue(
+                payload,
                 function (err, data) {
                     if (!err) {
                         resolve(UniversalFunctions.sendSuccess(null, data));
@@ -184,15 +178,18 @@ var editValuesOfCompany = {
         });
     },
     options: {
-        description: "edit Values of Company",
+        description: "edit Value of Company",
         tags: ["api", "admin"],
         auth: "UserAuth",
         validate: {
             headers: UniversalFunctions.authorizationHeaderObj,
             payload: Joi.object({
-                valuesId: Joi.string().required(),
-                name: Joi.string().required(),
-                description: Joi.string().required()
+                name: Joi.string().optional().allow(),
+                description: Joi.string().optional().allow()
+            }),
+            params: Joi.object({
+                valueId: Joi.string().required(),
+                companyId: Joi.string().required()
             }),
             failAction: UniversalFunctions.failActionFunction
         },
@@ -237,8 +234,6 @@ var removeValueFromCompany = {
             headers: UniversalFunctions.authorizationHeaderObj,
             payload: Joi.object({
                 valuesId: Joi.string().required(),
-                // name: Joi.string().required(),
-                // description: Joi.string().required()
             }),
             failAction: UniversalFunctions.failActionFunction
         },

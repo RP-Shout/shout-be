@@ -9,6 +9,7 @@ var company = new Schema({
   location: { type: String, trim: true },
   businessPhoneNumber: { type: Number, trim: true },
   contactEmail: { type: String, unique: true, sparse: true },
+  values: [{ type: Schema.Types.ObjectId, ref: 'companyValues' }],
   companyDescription: { type: String, trim: true },
   teamsConfig: {
     attentionSpan: { type: Number, default: 30 },
