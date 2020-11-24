@@ -334,6 +334,9 @@ var removeValueFromCompany = function (userData, payloadData, callback) {
           select: '_id name description',
           match: {
             isActive: true
+          },
+          options: {
+            lean: true
           }
         }, function (err, data) {
           if (err) cb(err)
@@ -557,7 +560,6 @@ var getCompanyForManager = function (userData, callback) {
           }
         });
       },
-
       function (cb) {
         Service.UserService.getUserExtended({ userId: userFound._id }, {}, {}, function (err, data) {
           if (err) cb(err)
@@ -567,9 +569,17 @@ var getCompanyForManager = function (userData, callback) {
           }
         })
       },
-
       function (cb) {
-        Service.CompanyService.getCompany({ _id: userDetails.companyId }, {}, {}, function (err, data) {
+        Service.CompanyService.getCompanyPopulated({ _id: userDetails.companyId }, {}, {
+          path: 'values',
+          match: {
+            isActive: true
+          },
+          select: 'isActive _id name description',
+          options: {
+            lean: true
+          }
+        }, function (err, data) {
           if (err) cb(err)
           else {
             if (data.length == 0) cb(ERROR.INVALID_COMPANY_ID)
@@ -643,6 +653,8 @@ var getCompanies = function (userData, callback) {
     }
   );
 };
+
+
 module.exports = {
   // createCompany: createCompany,
   updateCompany: updateCompany,

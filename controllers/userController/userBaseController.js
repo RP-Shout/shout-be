@@ -273,7 +273,7 @@ var verifyOTP = function (userData, payloadData, callback) {
 };
 
 var loginUser = function (payloadData, callback) {
-  var userFound = false;
+  var userFound;
   var accessToken = null;
   var successLogin = false;
   var updatedUserDetails = null;
@@ -377,7 +377,7 @@ var loginUser = function (payloadData, callback) {
       },
       function (cb) {
         if (successLogin) {
-          var tokenData = {
+          const tokenData = {
             id: userFound._id,
             type:
               UniversalFunctions.CONFIG.APP_CONSTANTS.DATABASE.USER_ROLES.USER
@@ -1481,8 +1481,7 @@ const getNonShoutedUsers = (payload, callback) => {
         }, { receiverId: 1 }, {}, (err, data) => {
           if (err) cb(err)
           else {
-            if (data.length === 0) cb(ERROR.NOT_FOUND)
-            else transactions = data;
+            transactions = data;
             cb();
           }
         })
@@ -1515,8 +1514,8 @@ const getNonShoutedUsers = (payload, callback) => {
       }
     ]
     , (err, data) => {
-      if (err) callback(err)
-      else callback(null, nonShoutedUsers)
+      if (err) callback(err);
+      else callback(null, nonShoutedUsers);
     })
 }
 
