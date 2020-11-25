@@ -564,12 +564,14 @@ var getCompanyForManager = function (userData, callback) {
         Service.UserService.getUserExtended({ userId: userFound._id }, {}, {}, function (err, data) {
           if (err) cb(err)
           else {
+            console.log(data);
             userDetails = data && data[0] || null;
             cb();
           }
         })
       },
       function (cb) {
+        console.log(userDetails._id)
         Service.CompanyService.getCompanyPopulated({ _id: userDetails.companyId }, {}, {
           path: 'values',
           match: {

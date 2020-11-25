@@ -17,5 +17,6 @@ module.exports = {
     MerchantExtended: require('./merchantExtended'),
     MerchantOrderHistory: require('./merchantOrderHistory'),
     MerchantClaims: require('./merchantClaims'),
-    CompanyValues: require('./companyValues')
+    CompanyValues: require('./companyValues'),
+    UserPerformance: require('./userPerformance')
 };

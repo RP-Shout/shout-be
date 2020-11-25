@@ -11,5 +11,6 @@ module.exports = {
   TopUpService: require('./topUpService'),
   ShoutedTeamHistoryService: require('./shoutedTeamHistoryService'),
   MerchantService: require('./merchantService'),
-  CompanyValueService: require('./companyValueService')
+  CompanyValueService: require('./companyValueService'),
+  UserPerformanceService: require('./userPerformance')
 };
